@@ -256,6 +256,7 @@ const Event = () => {
                         size={{ base: "sm", md: "md" }}
                         isLoading={isEditing}
                         isDisabled={isEditing}
+                        type="submit"
                       >
                         Update event
                       </Button>
