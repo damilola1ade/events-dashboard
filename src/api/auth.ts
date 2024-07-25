@@ -10,7 +10,7 @@ export const signup = async (payload: AuthPayload): Promise<string> => {
       throw new Error(res?.data?.message || "Sign up failed");
     }
 
-    return res.data.accessToken;
+    return res.data;
   } catch (error: any) {
     throw new Error(error.response?.data?.message || "Unauthorized action");
   }
@@ -24,7 +24,7 @@ export const login = async (payload: AuthPayload): Promise<string> => {
       throw new Error(res?.data?.message || "Login failed");
     }
 
-    return res.data.accessToken;
+    return res.data;
   } catch (error: any) {
     throw new Error(error.response?.data?.message || "Login failed");
   }
