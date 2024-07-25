@@ -5,8 +5,6 @@ export const useRole = () => {
   let Admin = false;
   let User = false;
 
-  console.log(parsedUser)
-
   if (user) {
     Admin = parsedUser?.user?.role?.includes("ADMIN");
     User = parsedUser?.user?.role.includes("USER");

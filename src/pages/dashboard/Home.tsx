@@ -11,7 +11,7 @@ const Home = () => {
   if (isLoading) return <Loader />;
 
   return (
-    <Flex p={4} flexDirection="column" gap={24}>
+    <Flex p={4} flexDirection="column" gap={{ base: 12, md: 24 }}>
       <Flex w="100%" justifyContent="space-between" alignItems="center" gap={4}>
         <Image src="/images/logo.png" w={{ base: "80px", lg: "144px" }} />
 
@@ -26,7 +26,7 @@ const Home = () => {
 
       {data?.events?.length > 0 ? (
         <>
-          <Text fontWeight="bold" fontSize={{ base: "lg", md: "4xl" }}>
+          <Text fontWeight="bold" fontSize={{ base: "xl", md: "4xl" }}>
             Upcoming Events
           </Text>
           <SimpleGrid columns={[1, 1, 3]} gap={12}>
@@ -57,7 +57,9 @@ const Home = () => {
           alignItems="center"
           color="black"
         >
-          <Text fontWeight="bold" fontSize={{base: 'sm', md: '2xl'}}>No upcoming event..</Text>
+          <Text fontWeight="bold" fontSize={{ base: "sm", md: "2xl" }}>
+            No upcoming event..
+          </Text>
         </Flex>
       )}
     </Flex>
