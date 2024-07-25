@@ -29,7 +29,6 @@ const EventCard = ({
         <Stack mt="6" spacing="3">
           <Flex w="100%" justifyContent="space-between">
             <Text
-              maxW="150px"
               fontSize={{ base: "sm", lg: "md" }}
               fontWeight="bold"
             >
