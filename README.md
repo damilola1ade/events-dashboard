@@ -1,6 +1,7 @@
 **Technolgies used**
 - Vite
 - Typescript
+- Chakra UI
 - React Query
 - Axios
 - Node.Js
