@@ -1,20 +1,17 @@
-import { useMutation, useQueryClient } from "react-query";
-import { login, signup } from "../api/auth";
+/* eslint-disable @typescript-eslint/no-explicit-any */
+import { useMutation } from "react-query";
+import { login, logout, signup } from "../api/auth";
 import { AuthPayload } from "../types";
+import { useAuth } from "../context/AuthContext";
 
 export const useSignUpMutation = () => {
-  const queryClient = useQueryClient();
   const {
     isLoading,
     isSuccess,
     isError,
     error,
     mutate: SignUp,
-  } = useMutation<string, Error, AuthPayload>((payload) => signup(payload), {
-    onSuccess: () => {
-      queryClient.invalidateQueries([""]);
-    },
-  });
+  } = useMutation<string, Error, AuthPayload>((payload) => signup(payload));
 
   return {
     isLoading,
@@ -25,18 +22,19 @@ export const useSignUpMutation = () => {
   };
 };
 
-export const useLoginUpMutation = () => {
-  const queryClient = useQueryClient();
+export const useLoginMutation = () => {
+  const { login: setUser } = useAuth();
   const {
     isLoading,
     isSuccess,
     isError,
     error,
     mutate: Login,
-  } = useMutation<string, Error, AuthPayload>((payload) => login(payload), {
-    onSuccess: (accessToken) => {
+  } = useMutation<any, Error, AuthPayload>((payload) => login(payload), {
+    onSuccess: (data) => {
+      const { accessToken }: any = data;
       localStorage.setItem("accessToken", accessToken);
-      queryClient.invalidateQueries([""]);
+      setUser(data);
     },
   });
 
@@ -46,5 +44,30 @@ export const useLoginUpMutation = () => {
     isError,
     error,
     Login,
+  };
+};
+
+export const useLogoutMutation = () => {
+  const {
+    isLoading,
+    isSuccess,
+    isError,
+    error,
+    mutate: Logout,
+  } = useMutation(logout, {
+    onSuccess: () => {
+      localStorage.clear()
+    },
+    onError: (error) => {
+      console.error("Logout failed", error);
+    },
+  });
+
+  return {
+    isLoading,
+    isSuccess,
+    isError,
+    error,
+    Logout,
   };
 };

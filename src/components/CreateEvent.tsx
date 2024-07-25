@@ -13,40 +13,42 @@ import {
   Input,
   Textarea,
 } from "@chakra-ui/react";
-import { useEffect } from "react";
 import { useForm, SubmitHandler } from "react-hook-form";
-import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import { useCreateEventMutation } from "../services/event";
 
 import { EventPayload } from "../types";
 import Button from "./Button";
+import { ErrorText } from ".";
+import { useFormValidation } from "../hooks/useFormValidation";
 
 const CreateEvent = () => {
   const { isOpen, onOpen, onClose } = useDisclosure();
 
-  const { register, handleSubmit } = useForm<EventPayload>();
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+    reset,
+  } = useForm<EventPayload>();
 
-  const navigate = useNavigate();
+  const { isLoading, CreateEvent } = useCreateEventMutation();
 
-  const { isLoading, isSuccess, isError, error, CreateEvent } =
-    useCreateEventMutation();
+  const { otherValidation } = useFormValidation();
 
   const onSubmit: SubmitHandler<EventPayload> = (payload) => {
-    CreateEvent(payload);
+    CreateEvent(payload, {
+      onSuccess: () => {
+        onClose();
+        toast.success("Event created successfully!");
+        reset();
+      },
+      onError: (error) => {
+        toast.error(error?.message);
+      },
+    });
   };
 
-  useEffect(() => {
-    if (isSuccess) {
-      navigate("/home");
-      toast.success('Event created successfully!');
-      onClose();
-    }
-
-    if (isError) {
-      toast.error(error?.message);
-    }
-  }, [error, isError, isSuccess, navigate, onClose]);
   return (
     <>
       <Button onClick={onOpen}>Create event</Button>
@@ -62,76 +64,95 @@ const CreateEvent = () => {
                 <Box>
                   <FormLabel
                     fontWeight="bold"
-                    fontSize={{ sm: "12px", md: "14px" }}
+                    fontSize={{ base: "xs", md: "md" }}
                   >
                     Event name
                   </FormLabel>
 
                   <Input
-                    {...register("eventName")}
-                    fontSize={{ sm: "12px", md: "14px" }}
+                    {...register("eventName", {
+                      ...otherValidation,
+                    })}
+                    fontSize={{ base: "xs", md: "md" }}
                     placeholder="Provide a name for the event"
                     height="50px"
                     borderRadius="sm"
                     type="text"
+                    borderColor={errors.eventName && "red"}
                   />
+                  {errors.eventName && (
+                    <ErrorText error={errors.eventName.message} />
+                  )}
                 </Box>
 
                 <Box>
                   <FormLabel
                     fontWeight="bold"
-                    fontSize={{ sm: "12px", md: "14px" }}
+                    fontSize={{ base: "xs", md: "md" }}
                   >
                     Date & Time
                   </FormLabel>
                   <Input
-                  {...register("date")}
+                    {...register("date")}
+                    height="50px"
                     placeholder="Select Date and Time"
-                    size="md"
+                    size={{ base: "xs", lg: "sm" }}
                     type="datetime-local"
+                    required
                   />
                 </Box>
 
                 <Box>
                   <FormLabel
                     fontWeight="bold"
-                    fontSize={{ sm: "12px", md: "14px" }}
+                    fontSize={{ base: "xs", md: "md" }}
                   >
                     Location
                   </FormLabel>
 
                   <Input
-                    id="location"
-                    {...register("location")}
-                    fontSize={{ sm: "12px", md: "14px" }}
+                    {...register("location", {
+                      ...otherValidation,
+                    })}
+                    fontSize={{ base: "xs", md: "md" }}
                     placeholder="Input location"
                     height="50px"
                     borderRadius="sm"
                     type="text"
+                    borderColor={errors.location && "red"}
                   />
+                  {errors.location && (
+                    <ErrorText error={errors.location.message} />
+                  )}
                 </Box>
 
                 <Box>
                   <FormLabel
                     fontWeight="bold"
-                    fontSize={{ sm: "12px", md: "14px" }}
+                    fontSize={{ base: "xs", md: "md" }}
                   >
                     Description
                   </FormLabel>
 
                   <Textarea
-                    {...register("description")}
-                    fontSize={{ sm: "12px", md: "14px" }}
+                    {...register("description", {
+                      ...otherValidation,
+                    })}
+                    fontSize={{ base: "xs", md: "md" }}
                     placeholder="Email"
                     height="50px"
                     borderRadius="sm"
+                    borderColor={errors.description && "red"}
                   />
+                  {errors.description && (
+                    <ErrorText error={errors.description.message} />
+                  )}
                 </Box>
               </Flex>
             </ModalBody>
 
             <ModalFooter bg="gray.200" borderRadius="md">
-              <Button isLoading={isLoading} type="submit">
+              <Button isLoading={isLoading} isDisabled={isLoading} type="submit">
                 Create event
               </Button>
             </ModalFooter>

@@ -1,6 +1,8 @@
 import { Routes, Route, Navigate } from "react-router-dom";
+import { ProtectedRoute } from "./utils/ProtectedRoute";
 import { Login, SignUp } from "./pages/auth";
-import { Home } from "./pages/dashboard";
+import { Event, Home } from "./pages/dashboard";
+
 import "./App.css";
 
 function App() {
@@ -9,7 +11,22 @@ function App() {
       <Route path="/" element={<Navigate to="/login" replace />} />
       <Route path="/login" element={<Login />} />
       <Route path="/signup" element={<SignUp />} />
-      <Route path="/home" element={<Home />} />
+      <Route
+        path="/home"
+        element={
+          <ProtectedRoute>
+            <Home />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/event/:id"
+        element={
+          <ProtectedRoute>
+            <Event />
+          </ProtectedRoute>
+        }
+      />
     </Routes>
   );
 }

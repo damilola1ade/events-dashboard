@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { SubmitHandler, useForm } from "react-hook-form";
 
@@ -14,34 +14,41 @@ import {
   Box,
 } from "@chakra-ui/react";
 import { BsEyeFill, BsEyeSlash } from "react-icons/bs";
-import { useLoginUpMutation } from "../../services/auth";
+
+import { useLoginMutation } from "../../services/auth";
+
 import { toast } from "sonner";
 
 import { AuthPayload } from "../../types";
+import { useFormValidation } from "../../hooks/useFormValidation";
+import { ErrorText } from "../../components";
 
 const Login = () => {
-  const { register, handleSubmit } = useForm<AuthPayload>();
-
-  const navigate = useNavigate();
-
-  const { isLoading, isSuccess, isError, error, Login } = useLoginUpMutation();
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<AuthPayload>();
 
   const [show, setShow] = useState(false);
   const handleShow = () => setShow(!show);
 
-  const onSubmit: SubmitHandler<AuthPayload> = (data) => {
-    Login(data);
+  const navigate = useNavigate();
+
+  const { isLoading, Login } = useLoginMutation();
+
+  const { emailValidation } = useFormValidation();
+
+  const onSubmit: SubmitHandler<AuthPayload> = (payload) => {
+    Login(payload, {
+      onSuccess: () => {
+        navigate("/home");
+      },
+      onError: (error) => {
+        toast.error(error?.message);
+      },
+    });
   };
-
-  useEffect(() => {
-    if (isSuccess) {
-      navigate("/home");
-    }
-
-    if (isError) {
-      toast.error(error?.message);
-    }
-  }, [error, isError, isSuccess, navigate]);
 
   return (
     <Flex position="relative" overflow="hidden">
@@ -89,27 +96,30 @@ const Login = () => {
                     <Box>
                       <FormLabel
                         fontWeight="bold"
-                        fontSize={{ sm: "12px", md: "14px" }}
+                        fontSize={{ base: "xs", md: "md" }}
                       >
                         Email
                       </FormLabel>
 
                       <Input
-                        id="email"
-                        {...register("email")}
-                        autoComplete="true"
-                        fontSize={{ sm: "12px", md: "14px" }}
+                        {...register("email", {
+                          ...emailValidation,
+                        })}
+                        fontSize={{ base: "xs", md: "md" }}
                         placeholder="Email"
                         height="50px"
                         borderRadius="sm"
-                        type="email"
+                        borderColor={errors.email && "red"}
                       />
+                      {errors.email && (
+                        <ErrorText error={errors.email.message} />
+                      )}
                     </Box>
 
                     <Box>
                       <FormLabel
                         fontWeight="bold"
-                        fontSize={{ sm: "12px", md: "14px" }}
+                        fontSize={{ base: "xs", md: "md" }}
                       >
                         Password
                       </FormLabel>
@@ -117,12 +127,11 @@ const Login = () => {
                         <Input
                           id="password"
                           {...register("password")}
-                          autoComplete="true"
                           borderRadius="sm"
                           placeholder="Password"
                           height="50px"
                           type={show ? "text" : "password"}
-                          fontSize={{ sm: "12px", md: "14px" }}
+                          fontSize={{ base: "xs", md: "md" }}
                         />
 
                         <InputRightElement width="4.5rem">
@@ -154,8 +163,9 @@ const Login = () => {
                       width="100%"
                       height="50px"
                       isLoading={isLoading}
+                      isDisabled={isLoading}
                     >
-                      Sign up
+                      Login
                     </Button>
 
                     <Text

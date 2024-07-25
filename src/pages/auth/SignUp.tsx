@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { SubmitHandler, useForm } from "react-hook-form";
 
@@ -19,30 +19,36 @@ import { useSignUpMutation } from "../../services/auth";
 import { toast } from "sonner";
 
 import { AuthPayload } from "../../types";
+import { useFormValidation } from "../../hooks/useFormValidation";
+import { ErrorText } from "../../components";
 
 const SignUp = () => {
-  const { register, handleSubmit } = useForm<AuthPayload>();
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<AuthPayload>();
 
   const navigate = useNavigate();
 
-  const { isLoading, isSuccess, isError, error, SignUp } = useSignUpMutation();
+  const { isLoading, SignUp } = useSignUpMutation();
+
+  const { nameValidation, emailValidation, signUpPasswordValidation } =
+    useFormValidation();
 
   const [show, setShow] = useState(false);
   const handleShow = () => setShow(!show);
 
-  const onSubmit: SubmitHandler<AuthPayload> = (data) => {
-    SignUp(data);
+  const onSubmit: SubmitHandler<AuthPayload> = (payload) => {
+    SignUp(payload, {
+      onSuccess: () => {
+        navigate("/login");
+      },
+      onError: (error) => {
+        toast.error(error?.message);
+      },
+    });
   };
-
-  useEffect(() => {
-    if (isSuccess) {
-      navigate("/login");
-    }
-
-    if (isError) {
-      toast.error(error?.message);
-    }
-  }, [error, isError, isSuccess, navigate]);
 
   return (
     <Flex position="relative" overflow="hidden">
@@ -89,57 +95,65 @@ const SignUp = () => {
                     <Box>
                       <FormLabel
                         fontWeight="bold"
-                        fontSize={{ sm: "12px", md: "14px" }}
+                        fontSize={{ base: "xs", md: "md" }}
                       >
                         Name
                       </FormLabel>
 
                       <Input
-                        id="name"
-                        {...register("name")}
-                        fontSize={{ sm: "12px", md: "14px" }}
+                        {...register("name", {
+                          ...nameValidation,
+                        })}
+                        fontSize={{ base: "xs", md: "md" }}
                         placeholder="Damilola Adegbemile"
                         height="50px"
                         borderRadius="sm"
                         type="text"
                       />
+                      {errors.name && <ErrorText error={errors.name.message} />}
                     </Box>
 
                     <Box>
                       <FormLabel
                         fontWeight="bold"
-                        fontSize={{ sm: "12px", md: "14px" }}
+                        fontSize={{ base: "xs", md: "md" }}
                       >
                         Email
                       </FormLabel>
 
                       <Input
-                        id="email"
-                        {...register("email")}
-                        fontSize={{ sm: "12px", md: "14px" }}
+                        {...register("email", {
+                          ...emailValidation,
+                        })}
+                        fontSize={{ base: "xs", md: "md" }}
                         placeholder="Email"
                         height="50px"
                         borderRadius="sm"
-                        type="email"
+                        borderColor={errors.email && "red"}
                       />
+                      {errors.email && (
+                        <ErrorText error={errors.email.message} />
+                      )}
                     </Box>
 
                     <Box>
                       <FormLabel
                         fontWeight="bold"
-                        fontSize={{ sm: "12px", md: "14px" }}
+                        fontSize={{ base: "xs", md: "md" }}
                       >
                         Password
                       </FormLabel>
                       <InputGroup>
                         <Input
                           id="password"
-                          {...register("password")}
+                          {...register("password", {
+                            ...signUpPasswordValidation,
+                          })}
                           borderRadius="sm"
                           placeholder="Password"
                           height="50px"
                           type={show ? "text" : "password"}
-                          fontSize={{ sm: "12px", md: "14px" }}
+                          fontSize={{ base: "xs", md: "md" }}
                         />
 
                         <InputRightElement width="4.5rem">
@@ -159,6 +173,9 @@ const SignUp = () => {
                           </Button>
                         </InputRightElement>
                       </InputGroup>
+                      {errors.password && (
+                        <ErrorText error={errors.password.message} />
+                      )}
                     </Box>
 
                     <Button
@@ -171,6 +188,7 @@ const SignUp = () => {
                       width="100%"
                       height="50px"
                       isLoading={isLoading}
+                      isDisabled={isLoading}
                     >
                       Sign up
                     </Button>
