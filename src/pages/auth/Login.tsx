@@ -73,7 +73,6 @@ const Login = () => {
             m={{ base: "20px", md: "auto" }}
           >
             <Flex
-              h="100vh"
               flexDirection="column"
               gap={6}
               justifyContent="center"
@@ -110,6 +109,7 @@ const Login = () => {
                         height="50px"
                         borderRadius="sm"
                         borderColor={errors.email && "red"}
+                        type="email"
                       />
                       {errors.email && (
                         <ErrorText error={errors.email.message} />
