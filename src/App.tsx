@@ -4,34 +4,30 @@ import { Login, SignUp } from "./pages/auth";
 import { Event, Home } from "./pages/dashboard";
 
 import "./App.css";
-import { AlertModal } from "./components";
 
 function App() {
   return (
-    <>
-      <AlertModal />
-      <Routes>
-        <Route path="/" element={<Navigate to="/login" replace />} />
-        <Route path="/login" element={<Login />} />
-        <Route path="/signup" element={<SignUp />} />
-        <Route
-          path="/home"
-          element={
-            <ProtectedRoute>
-              <Home />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/event/:id"
-          element={
-            <ProtectedRoute>
-              <Event />
-            </ProtectedRoute>
-          }
-        />
-      </Routes>
-    </>
+    <Routes>
+      <Route path="/" element={<Navigate to="/login" replace />} />
+      <Route path="/login" element={<Login />} />
+      <Route path="/signup" element={<SignUp />} />
+      <Route
+        path="/home"
+        element={
+          <ProtectedRoute>
+            <Home />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/event/:id"
+        element={
+          <ProtectedRoute>
+            <Event />
+          </ProtectedRoute>
+        }
+      />
+    </Routes>
   );
 }
 
